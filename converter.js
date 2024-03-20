@@ -67,15 +67,19 @@ const createConverter = config => {
         const members = [...(model.Fields || []), ...(model.Properties || [])];
         const baseClasses = model.BaseClasses && model.BaseClasses.length ? ` extends ${model.BaseClasses.join(', ')}` : '';
 
-        rows.push(`// ${filename}`);
+        if (!config.omitFilePathComment) {
+            rows.push(`// ${filename}`);
+        }
         rows.push(`export interface ${model.ModelName}${baseClasses} {`);
 
+        const propertySemicolon = config.omitSemicolon ? '' : ';';
+
         if (model.IndexSignature) {
-            rows.push(`    ${convertIndexType(model.IndexSignature)};`);
+            rows.push(`    ${convertIndexType(model.IndexSignature)}${propertySemicolon}`);
         }
 
         members.forEach(member => {
-            rows.push(`    ${convertProperty(member)};`);
+            rows.push(`    ${convertProperty(member)}${propertySemicolon}`);
         });
 
         rows.push(`}\n`);
@@ -85,7 +89,9 @@ const createConverter = config => {
 
     const convertEnum = (enum_, filename) => {
         const rows = [];
-        rows.push(`// ${filename}`);
+        if (!config.omitFilePathComment) {
+            rows.push(`// ${filename}`);
+        }
 
         const entries = Object.entries(enum_.Values);
 
@@ -93,11 +99,13 @@ const createConverter = config => {
             ? camelcase(value)
             : value;
 
+        const lastValueSemicolon = config.omitSemicolon ? '' : ';';
+
         if (config.stringLiteralTypesInsteadOfEnums) {
             rows.push(`export type ${enum_.Identifier} =`);
 
             entries.forEach(([key], i) => {
-                const delimiter = (i === entries.length - 1) ? ';' : ' |';
+                const delimiter = (i === entries.length - 1) ? lastValueSemicolon : ' |';
                 rows.push(`    '${getEnumStringValue(key)}'${delimiter}`);
             });
 
