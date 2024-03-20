@@ -155,7 +155,30 @@ namespace CSharpModelsToJson.Tests
             Assert.That(modelCollector.Models, Is.Not.Null);
             Assert.That(modelCollector.Models.First().Properties, Is.Not.Null);
             Assert.That(modelCollector.Models.First().Properties.Count(), Is.EqualTo(1));
+        }
 
+        [Test]
+        public void UsesJsonPropertyName_ReturnsIdentifierAsJsonPropertyName()
+        {
+            var tree = CSharpSyntaxTree.ParseText(
+                """
+                public class A
+                {
+                    [JsonPropertyName("differentName")]
+                    public string NotThisName { get; set }
+                }
+                """
+            );
+
+            var root = (CompilationUnitSyntax)tree.GetRoot();
+
+            var modelCollector = new ModelCollector();
+            modelCollector.VisitClassDeclaration(root.DescendantNodes().OfType<ClassDeclarationSyntax>().First());
+
+            Assert.That(modelCollector.Models, Is.Not.Null);
+            Assert.That(modelCollector.Models.First().Properties, Is.Not.Null);
+            Assert.That(modelCollector.Models.First().Properties.Count(), Is.EqualTo(1));
+            Assert.That(modelCollector.Models.First().Properties.First().Identifier, Is.EqualTo("differentName"));
         }
 
         [Test]
