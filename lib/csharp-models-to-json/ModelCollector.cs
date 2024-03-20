@@ -101,10 +101,25 @@ namespace CSharpModelsToJson
             Type = field.Declaration.Type.ToString(),
         };
 
-        private static Property ConvertProperty(PropertyDeclarationSyntax property) => new Property
+        // private static Property ConvertProperty(PropertyDeclarationSyntax property) => new Property
+        // {
+        //     Identifier = property.Identifier.ToString(),
+        //     Type = property.Type.ToString(),
+        // };
+        
+        private static Property ConvertProperty(PropertyDeclarationSyntax property)
         {
-            Identifier = property.Identifier.ToString(),
-            Type = property.Type.ToString(),
-        };
+            // Check for the JsonPropertyName attribute
+            var jsonPropertyName = property.AttributeLists
+                .SelectMany(attrList => attrList.Attributes)
+                .FirstOrDefault(attr => attr.Name.ToString().EndsWith("JsonPropertyName"))
+                ?.ArgumentList?.Arguments.FirstOrDefault()?.Expression.ToString().Trim('"'); // Extract the value of the JsonPropertyName attribute
+
+            return new Property
+            {
+                Identifier = jsonPropertyName ?? property.Identifier.ToString(),
+                Type = property.Type.ToString(),
+            };
+        }
     }
 }
