@@ -51,7 +51,8 @@ const dotnetProcess = spawn('dotnet', ['run', `--project "${dotnetProject}"`, `"
 let stdout = '';
 
 dotnetProcess.stdout.on('data', data => {
-    if (data.toLowerCase().includes('warning')) {
+    let dataStr = data.toString();  // Convert Buffer to string
+    if (dataStr.toLowerCase().includes('warning')) {
         return;
     }
     stdout += data;
