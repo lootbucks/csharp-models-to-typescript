@@ -46,11 +46,12 @@ const converter = createConverter({
 let timer = process.hrtime();
 
 const dotnetProject = path.join(__dirname, 'lib/csharp-models-to-json');
-const dotnetProcess = spawn('dotnet', ['run', '-p:NoWarn=*', `--project "${dotnetProject}"`, `"${path.resolve(configPath)}"`, '|', 'grep', '--invert-match WARNING', '--line-buffered'], { shell: true });
+const dotnetProcess = spawn('dotnet', ['run', `--project "${dotnetProject}"`, `"${path.resolve(configPath)}"`], { shell: true });
 
 let stdout = '';
 
 dotnetProcess.stdout.on('data', data => {
+    if (data.contains('Warning')){return;}
     stdout += data;
 });
 
