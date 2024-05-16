@@ -52,7 +52,7 @@ let stdout = '';
 
 dotnetProcess.stdout.on('data', data => {
     let dataStr = data.toString();  // Convert Buffer to string
-    if (dataStr.toLowerCase().includes('warning')) {
+    if (dataStr.includes(': Warning ')) {
         return;
     }
     stdout += data;
