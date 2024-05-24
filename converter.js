@@ -94,6 +94,37 @@ const createConverter = config => {
         }
 
         const entries = Object.entries(enum_.Values);
+        const computedValues = {};
+
+        // Utility function to evaluate numeric expressions
+        const evaluateExpression = (expr) => {
+            try {
+                return eval(expr); // Use eval to evaluate expressions like '1 << 3'
+            } catch (e) {
+                return 0; // Default to 0 if evaluation fails
+            }
+        };
+
+        // First pass: Store numeric and simple values
+        entries.forEach(([key, value]) => {
+            if (typeof value === 'number' || !value.includes('|')) {
+                // Direct assignment of numeric values or simple string values without bitwise operations
+                computedValues[key] = evaluateExpression(value);
+            }
+        });
+
+        // Second pass: Compute derived values
+        entries.forEach(([key, value]) => {
+            if (typeof value === 'string' && value.includes('|')) {
+                // Handle computed bitwise OR operations for values
+                let computedValue = 0;
+                value.split('|').forEach(part => {
+                    part = part.trim();
+                    computedValue |= computedValues[part] !== undefined ? computedValues[part] : evaluateExpression(part);
+                });
+                computedValues[key] = computedValue;
+            }
+        });
 
         const getEnumStringValue = (value) => config.camelCaseEnums
             ? camelcase(value)
@@ -104,29 +135,12 @@ const createConverter = config => {
         if (config.objectTypesInsteadOfEnums) {
 
             const enumName = enum_.Identifier + "Value";
-            
             rows.push(`type ${enum_.Identifier} = (typeof ${enumName})[keyof typeof ${enumName}];\n`);
-            
             rows.push(`export const ${enumName} = {`);
 
-            entries.forEach(([key, value], i) => {
+            Object.entries(computedValues).forEach(([key, value], i) => {
                 if (config.numericEnums) {
-                    const computedValues = {};
-                    
-                    if (typeof value === 'string' && value.includes('|')) {
-                        // Handle computed bitwise OR operations for values
-                        let computedValue = 0;
-                        value.split('|').forEach(part => {
-                            part = part.trim();
-                            computedValue |= computedValues[part] || 0; // Compute value using existing entries
-                        });
-                        computedValues[key] = computedValue;
-                        rows.push(`    ${key} : ${computedValue},`);
-                    } else {
-                        value = value != null ? value : i;
-                        computedValues[key] = value;
-                        rows.push(`    ${key} : ${value},`);
-                    }
+                    rows.push(`    ${key} : ${value},`);
                 } else {
                     rows.push(`    ${key} : '${getEnumStringValue(key)}',`);
                 }
