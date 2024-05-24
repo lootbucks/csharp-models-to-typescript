@@ -111,7 +111,20 @@ const createConverter = config => {
 
             entries.forEach(([key, value], i) => {
                 if (config.numericEnums) {
-                    rows.push(`    ${key} : ${value != null ? value : i},`);
+                    if (typeof value === 'string' && value.includes('|')) {
+                        // Handle computed bitwise OR operations for values
+                        let computedValue = 0;
+                        value.split('|').forEach(part => {
+                            part = part.trim();
+                            computedValue |= computedValues[part] || 0; // Compute value using existing entries
+                        });
+                        computedValues[key] = computedValue;
+                        rows.push(`    ${key} : ${computedValue},`);
+                    } else {
+                        value = value != null ? value : i;
+                        computedValues[key] = value;
+                        rows.push(`    ${key} : ${value},`);
+                    }
                 } else {
                     rows.push(`    ${key} : '${getEnumStringValue(key)}',`);
                 }
