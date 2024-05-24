@@ -154,14 +154,14 @@ const createConverter = config => {
         return `${identifier}: ${type}`;
     };
 
-    const convertIndexType = indexType => {
-        const dictionary = indexType.match(dictionaryRegex);
-        const simpleDictionary = indexType.match(simpleDictionaryRegex);
+     const convertIndexType = indexType => {
+       const dictionary = indexType.match(dictionaryRegex);
+       const simpleDictionary = indexType.match(simpleDictionaryRegex);
 
-        propType = simpleDictionary ? dictionary[2] : parseType(dictionary[2]);
+       propType = simpleDictionary ? dictionary[2] : parseType(dictionary[2]);
 
-        return `[key: ${convertType(dictionary[1])}]: ${convertType(propType)}`;
-    };
+       return `[key: ${convertType(dictionary[1])}]: ${convertType(propType)}`;
+     };
 
     const convertRecord = indexType => {
         const dictionary = indexType.match(dictionaryRegex);
