@@ -107,6 +107,7 @@ const createConverter = config => {
 
         // First pass: Store numeric and simple values
         entries.forEach(([key, value]) => {
+            console.log('entry first pass', key, value);
             if (typeof value === 'number' || !value.includes('|')) {
                 // Direct assignment of numeric values or simple string values without bitwise operations
                 computedValues[key] = evaluateExpression(value);
@@ -115,6 +116,7 @@ const createConverter = config => {
 
         // Second pass: Compute derived values
         entries.forEach(([key, value]) => {
+            console.log('entry second pass', key, value);
             if (typeof value === 'string' && value.includes('|')) {
                 // Handle computed bitwise OR operations for values
                 let computedValue = 0;
@@ -123,6 +125,7 @@ const createConverter = config => {
                     computedValue |= computedValues[part] !== undefined ? computedValues[part] : evaluateExpression(part);
                 });
                 computedValues[key] = computedValue;
+                console.log('computed', computedValue);
             }
         });
 
