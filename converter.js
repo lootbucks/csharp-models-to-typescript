@@ -103,11 +103,11 @@ const createConverter = config => {
 
         if (config.objectTypesInsteadOfEnums) {
 
-            const enumName = enum_.Identifier + "Object";
+            const enumName = enum_.Identifier + "Value";
             
-            rows.push(`type ${enum_.Identifier}Value = (typeof ${enumName})[keyof typeof ${enumName}];\n`);
+            rows.push(`type ${enum_.Identifier} = (typeof ${enumName})[keyof typeof ${enumName}];\n`);
             
-            rows.push(`export const ${enumName} = {`);
+            rows.push(`export const ${enumName}Value = {`);
 
             entries.forEach(([key, value], i) => {
                 if (config.numericEnums) {
