@@ -107,7 +107,7 @@ const createConverter = config => {
             
             rows.push(`type ${enum_.Identifier} = (typeof ${enumName})[keyof typeof ${enumName}];\n`);
             
-            rows.push(`export const ${enumName}Value = {`);
+            rows.push(`export const ${enumName} = {`);
 
             entries.forEach(([key, value], i) => {
                 if (config.numericEnums) {
