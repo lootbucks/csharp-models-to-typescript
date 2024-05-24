@@ -111,6 +111,8 @@ const createConverter = config => {
 
             entries.forEach(([key, value], i) => {
                 if (config.numericEnums) {
+                    const computedValues = {};
+                    
                     if (typeof value === 'string' && value.includes('|')) {
                         // Handle computed bitwise OR operations for values
                         let computedValue = 0;
