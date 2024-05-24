@@ -40,6 +40,7 @@ const converter = createConverter({
     omitFilePathComment: config.omitFilePathComment || false,
     omitSemicolon: config.omitSemicolon || false,
     stringLiteralTypesInsteadOfEnums: config.stringLiteralTypesInsteadOfEnums || false,
+    objectTypesInsteadOfEnums: config.objectTypesInsteadOfEnums || false,
     exportedModule: config.exportedModule || false
 });
 
