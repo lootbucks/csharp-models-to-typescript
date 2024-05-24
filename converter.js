@@ -101,7 +101,25 @@ const createConverter = config => {
 
         const lastValueSemicolon = config.omitSemicolon ? '' : ';';
 
-        if (config.stringLiteralTypesInsteadOfEnums) {
+        if (config.objectTypesInsteadOfEnums) {
+
+            const enumName = enum_.Identifier + "Object";
+            
+            rows.push(`type ${enum_.Identifier} = (typeof ${enumName})[keyof typeof ${enumName}];\n`);
+            
+            rows.push(`export const ${enumName} = {`);
+
+            entries.forEach(([key, value], i) => {
+                if (config.numericEnums) {
+                    rows.push(`    ${key} : ${value != null ? value : i},`);
+                } else {
+                    rows.push(`    ${key} : '${getEnumStringValue(key)}',`);
+                }
+            });
+
+            rows.push(`} as const;\n`);
+
+        } else if (config.stringLiteralTypesInsteadOfEnums) {
             rows.push(`export type ${enum_.Identifier} =`);
 
             entries.forEach(([key], i) => {
@@ -136,14 +154,14 @@ const createConverter = config => {
         return `${identifier}: ${type}`;
     };
 
-     const convertIndexType = indexType => {
-       const dictionary = indexType.match(dictionaryRegex);
-       const simpleDictionary = indexType.match(simpleDictionaryRegex);
+    const convertIndexType = indexType => {
+        const dictionary = indexType.match(dictionaryRegex);
+        const simpleDictionary = indexType.match(simpleDictionaryRegex);
 
-       propType = simpleDictionary ? dictionary[2] : parseType(dictionary[2]);
+        propType = simpleDictionary ? dictionary[2] : parseType(dictionary[2]);
 
-       return `[key: ${convertType(dictionary[1])}]: ${convertType(propType)}`;
-     };
+        return `[key: ${convertType(dictionary[1])}]: ${convertType(propType)}`;
+    };
 
     const convertRecord = indexType => {
         const dictionary = indexType.match(dictionaryRegex);
