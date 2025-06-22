@@ -107,10 +107,15 @@ const createConverter = config => {
 
         // First pass: Store numeric and simple values
         entries.forEach(([key, value]) => {
+            try {
             if (typeof value === 'number' || !value.includes('|')) {
                 // Direct assignment of numeric values or simple string values without bitwise operations
                 computedValues[key] = evaluateExpression(value);
             }
+        } catch (err) {
+            console.log("key: " + key + " val: " + value);
+            throw err;
+        }
         });
 
         // Second pass: Compute derived values
